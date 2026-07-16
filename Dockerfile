@@ -10,6 +10,8 @@ RUN apt update &&\
 # ENV
 ENV BUILD_DIR=/i
 ENV PREFIX_DIR=/emsdk/upstream/emscripten/cache/sysroot
+# Cloudflare Workers do not expose shared WebAssembly memory or pthread workers.
+ENV EMCC_CFLAGS="-sSHARED_MEMORY=0"
 
 # opencv
 ENV OPENCV_VERSION=5.0.0
