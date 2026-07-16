@@ -93,7 +93,9 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     tar xvf expat-${EXPAT_VERSION}.tar.xz &&\
     cd expat-${EXPAT_VERSION} &&\
     emmake ./buildconf.sh --force &&\
-    emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking &&\
+    emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking \
+        --without-xmlwf --without-docbook --without-examples --without-tests \
+        --without-arc4random --without-arc4random-buf --without-getrandom --without-sys-getrandom &&\
     emmake make -j2 &&\
     emmake make install &&\
     cd .. && rm -rf expat-${EXPAT_VERSION}.tar.xz expat-${EXPAT_VERSION}
