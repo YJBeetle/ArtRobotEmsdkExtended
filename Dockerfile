@@ -55,7 +55,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://download.sourceforge.net/libpng/libpng-${PNG_VERSION}.tar.xz &&\
     tar xvf libpng-${PNG_VERSION}.tar.xz &&\
     cd libpng-${PNG_VERSION} &&\
-    emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking \
+    LDFLAGS="-L${PREFIX_DIR}/lib" emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking \
         --disable-tests --disable-tools &&\
     emmake make -j2 &&\
     emmake make install &&\
