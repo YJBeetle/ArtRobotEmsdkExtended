@@ -104,7 +104,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 RUN apt update &&\
     apt install -y python3 ninja-build &&\
     rm -rf /var/lib/apt/lists/* &&\
-    python3 -m pip install meson
+    python3 -m pip install --break-system-packages meson
 ADD emscripten.txt ${BUILD_DIR}/emscripten.txt
 
 # gperf
