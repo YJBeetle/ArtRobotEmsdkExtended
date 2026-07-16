@@ -262,17 +262,13 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 
 # shared-mime-info
 # 需要 gettext libxml2-utils
-ENV SHARED_MIME_INFO_VERSION=2.2
+ENV SHARED_MIME_INFO_VERSION=2.5.1
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/${SHARED_MIME_INFO_VERSION}/shared-mime-info-${SHARED_MIME_INFO_VERSION}.tar.bz2 &&\
     tar xvf shared-mime-info-${SHARED_MIME_INFO_VERSION}.tar.bz2 &&\
     cd shared-mime-info-${SHARED_MIME_INFO_VERSION} &&\
-    git clone https://gitlab.freedesktop.org/xdg/xdgmime.git &&\
-    cd xdgmime/src &&\
-    make &&\
-    cd ../../ &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
-        -Dbuild-tools=false &&\
+        -Dbuild-tools=false -Dbuild-tests=false -Dbuild-spec=false -Dbuild-translations=false &&\
     meson compile -C build &&\
     meson install -C build &&\
     ln -s ${PREFIX_DIR}/share/pkgconfig/shared-mime-info.pc ${PREFIX_DIR}/lib/pkgconfig/shared-mime-info.pc &&\
