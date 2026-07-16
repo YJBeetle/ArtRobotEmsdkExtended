@@ -1,4 +1,4 @@
-FROM emscripten/emsdk:latest
+FROM emscripten/emsdk:6.0.2
 
 SHELL ["/bin/bash", "-c"]
 
