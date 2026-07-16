@@ -34,7 +34,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd .. && rm -rf libjpeg-turbo-${JPEG_VERSION}.tar.gz libjpeg-turbo-${JPEG_VERSION}
 
 # zlib
-ENV ZLIB_VERSION=1.2.13
+ENV ZLIB_VERSION=1.3.2
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://github.com/madler/zlib/releases/download/v${ZLIB_VERSION}/zlib-${ZLIB_VERSION}.tar.xz &&\
     tar xvf zlib-${ZLIB_VERSION}.tar.xz &&\
