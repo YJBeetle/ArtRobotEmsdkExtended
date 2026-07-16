@@ -12,7 +12,7 @@ ENV BUILD_DIR=/i
 ENV PREFIX_DIR=/emsdk/upstream/emscripten/cache/sysroot
 
 # opencv
-ENV OPENCV_VERSION=4.6.0
+ENV OPENCV_VERSION=5.0.0
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://github.com/opencv/opencv/archive/refs/tags/${OPENCV_VERSION}.tar.gz -O opencv-${OPENCV_VERSION}.tar.gz &&\
     tar xvf opencv-${OPENCV_VERSION}.tar.gz &&\
