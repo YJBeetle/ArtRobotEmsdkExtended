@@ -164,8 +164,21 @@ RUN apt update &&\
     apt install -y gettext &&\
     rm -rf /var/lib/apt/lists/*
 
+# pcre2
+ENV PCRE2_VERSION=10.47
+RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
+    wget https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${PCRE2_VERSION}/pcre2-${PCRE2_VERSION}.tar.bz2 &&\
+    tar xvf pcre2-${PCRE2_VERSION}.tar.bz2 &&\
+    cd pcre2-${PCRE2_VERSION} &&\
+    emcmake cmake -B build -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} -DBUILD_SHARED_LIBS=OFF \
+        -DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=OFF -DPCRE2_BUILD_PCRE2_32=OFF \
+        -DPCRE2_BUILD_PCRE2GREP=OFF -DPCRE2_BUILD_TESTS=OFF -DPCRE2_SUPPORT_JIT=OFF &&\
+    cmake --build build -j2 &&\
+    cmake --install build &&\
+    cd .. && rm -rf pcre2-${PCRE2_VERSION}.tar.bz2 pcre2-${PCRE2_VERSION}
+
 # glib
-# 需要 libffi
+# 需要 libffi pcre2
 ENV GLIB_VERSION=2.89.1
 # See https://github.com/kleisauke/wasm-vips/blob/master/build.sh
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
