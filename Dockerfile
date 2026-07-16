@@ -173,6 +173,8 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     tar xvf glib-${GLIB_VERSION}.tar.xz &&\
     cd glib-${GLIB_VERSION} &&\
     curl -Ls https://github.com/GNOME/glib/compare/${GLIB_VERSION}...kleisauke:wasm-vips-${GLIB_VERSION}.patch | patch -p1 &&\
+    # GLib 没有关闭线程的 Meson 选项；保留 POSIX API，但单线程 WASM 不传播 -pthread。
+    sed -i "s/thread_dep = dependency('threads')/thread_dep = []/" meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         --force-fallback-for=gvdb -Dintrospection=disabled -Dselinux=disabled -Dxattr=false -Dlibmount=disabled \
         -Dsysprof=disabled -Dnls=disabled -Dglib_debug=disabled -Dtests=false -Dglib_assert=false -Dglib_checks=false &&\
