@@ -188,6 +188,12 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     curl -Ls https://github.com/GNOME/glib/compare/${GLIB_VERSION}...kleisauke:wasm-vips-${GLIB_VERSION}.patch | patch -p1 &&\
     # GLib 没有关闭线程的 Meson 选项；保留 POSIX API，但单线程 WASM 不传播 -pthread。
     sed -i "s/thread_dep = dependency('threads')/thread_dep = []/" meson.build &&\
+    # wasm-vips 补丁移除了 GRegex；librsvg 仍通过 GLib 公开 API 使用它，因此恢复 PCRE2 后端。
+    sed -i "/#include <glib\/grefstring.h>/a #include <glib/gregex.h>" glib/glib.h &&\
+    sed -i "/'grefstring.h',/a\  'gregex.h'," glib/meson.build &&\
+    sed -i "/'grefstring.c',/a\  'gregex.c'," glib/meson.build &&\
+    sed -i "/# Import the gvdb sources/i pcre2 = dependency('libpcre2-8', version: '>=10.32')" meson.build &&\
+    sed -i "/libsysprof_capture_dep,/a\    pcre2," glib/meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         --force-fallback-for=gvdb -Dintrospection=disabled -Dselinux=disabled -Dxattr=false -Dlibmount=disabled \
         -Dsysprof=disabled -Dnls=disabled -Dglib_debug=disabled -Dtests=false -Dglib_assert=false -Dglib_checks=false &&\
