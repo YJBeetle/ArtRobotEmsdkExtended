@@ -61,7 +61,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd .. && rm -rf libpng-${PNG_VERSION}.tar.xz libpng-${PNG_VERSION}
 
 # WebP
-ENV WEBP_VERSION=1.2.4
+ENV WEBP_VERSION=1.6.0
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-${WEBP_VERSION}.tar.gz &&\
     tar xvf libwebp-${WEBP_VERSION}.tar.gz &&\
