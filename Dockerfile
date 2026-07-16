@@ -228,7 +228,9 @@ RUN apt update &&\
 # Pango
 # 需要 harfbuzz fribidi fontconfig freetype glib cairo libglib2.0-dev-bin
 ENV PANGO_VERSION=1.50.14
+# Remove pthread flags leaked by dependency metadata; all sysroot libraries are single-threaded.
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
+    sed -i 's/ -pthread//g' ${PREFIX_DIR}/lib/pkgconfig/*.pc &&\
     wget https://download.gnome.org/sources/pango/${PANGO_VERSION%.*}/pango-${PANGO_VERSION}.tar.xz &&\
     tar xvf pango-${PANGO_VERSION}.tar.xz &&\
     cd pango-${PANGO_VERSION} &&\
