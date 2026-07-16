@@ -48,7 +48,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 
 # libpng
 # 需要 zlib
-ENV PNG_VERSION=1.6.38
+ENV PNG_VERSION=1.6.58
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://download.sourceforge.net/libpng/libpng-${PNG_VERSION}.tar.xz &&\
     tar xvf libpng-${PNG_VERSION}.tar.xz &&\
