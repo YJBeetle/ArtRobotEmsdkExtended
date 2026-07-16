@@ -17,7 +17,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://github.com/opencv/opencv/archive/refs/tags/${OPENCV_VERSION}.tar.gz -O opencv-${OPENCV_VERSION}.tar.gz &&\
     tar xvf opencv-${OPENCV_VERSION}.tar.gz &&\
     cd opencv-${OPENCV_VERSION} &&\
-    emmake python3 ./platforms/js/build_js.py --build_wasm $(emcmake echo | awk -v RS=' ' -v ORS=' ' '{print "--cmake_option=\""$1"\""}') --cmake_option="-DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}" build &&\
+    emcmake python3 ./platforms/js/build_js.py --build_wasm --cmake_option="-DCMAKE_INSTALL_PREFIX=${PREFIX_DIR}" build &&\
     cmake --build build -j2 &&\
     cmake --install build &&\
     cd .. && rm -rf opencv-${OPENCV_VERSION}.tar.gz opencv-${OPENCV_VERSION}
