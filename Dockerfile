@@ -28,7 +28,9 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/${JPEG_VERSION}/libjpeg-turbo-${JPEG_VERSION}.tar.gz &&\
     tar xvf libjpeg-turbo-${JPEG_VERSION}.tar.gz &&\
     cd libjpeg-turbo-${JPEG_VERSION} &&\
-    emcmake cmake -B build -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} &&\
+    emcmake cmake -B build -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} \
+        -DENABLE_SHARED=OFF -DENABLE_STATIC=ON \
+        -DWITH_TURBOJPEG=OFF -DWITH_TOOLS=OFF -DWITH_SIMD=OFF &&\
     cmake --build build -j2 &&\
     cmake --install build &&\
     cd .. && rm -rf libjpeg-turbo-${JPEG_VERSION}.tar.gz libjpeg-turbo-${JPEG_VERSION}
