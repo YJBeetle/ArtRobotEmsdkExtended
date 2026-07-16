@@ -128,7 +128,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 
 # pixman
 # 需要 zlib
-ENV PIXMAN_VERSION=0.42.0
+ENV PIXMAN_VERSION=0.46.4
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://www.cairographics.org/releases/pixman-${PIXMAN_VERSION}.tar.gz &&\
     tar xvf pixman-${PIXMAN_VERSION}.tar.gz &&\
