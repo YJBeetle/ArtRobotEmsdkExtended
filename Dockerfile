@@ -89,7 +89,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 # expat
 ENV EXPAT_VERSION=2.5.0
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
-    wget https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_VERSION//./_}/expat-${EXPAT_VERSION}.tar.xz &&\
+    wget https://github.com/libexpat/libexpat/releases/download/R_$(printf '%s' "${EXPAT_VERSION}" | tr . _)/expat-${EXPAT_VERSION}.tar.xz &&\
     tar xvf expat-${EXPAT_VERSION}.tar.xz &&\
     cd expat-${EXPAT_VERSION} &&\
     emmake ./buildconf.sh --force &&\
