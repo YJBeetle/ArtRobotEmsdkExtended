@@ -207,9 +207,9 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd .. && rm -rf harfbuzz-${HARFBUZZ_VERSION}.tar.xz harfbuzz-${HARFBUZZ_VERSION}
 
 # fribidi
-ENV FRIBIDI_VERSION=1.0.12
+ENV FRIBIDI_VERSION=1.0.16
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
-    wget https://github.com/fribidi/fribidi/releases/download/v1.0.12/fribidi-${FRIBIDI_VERSION}.tar.xz &&\
+    wget https://github.com/fribidi/fribidi/releases/download/v${FRIBIDI_VERSION}/fribidi-${FRIBIDI_VERSION}.tar.xz &&\
     tar xvf fribidi-${FRIBIDI_VERSION}.tar.xz &&\
     cd fribidi-${FRIBIDI_VERSION} &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
