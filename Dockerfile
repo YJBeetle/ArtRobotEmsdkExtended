@@ -137,6 +137,8 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://www.cairographics.org/releases/pixman-${PIXMAN_VERSION}.tar.gz &&\
     tar xvf pixman-${PIXMAN_VERSION}.tar.gz &&\
     cd pixman-${PIXMAN_VERSION} &&\
+    # Pixman 0.46.4 会为可用的 pthread 自动设置 HAVE_PTHREADS 并传播 -pthread；此镜像仅构建单线程 WASM。
+    sed -i "s/dep_threads = dependency('threads')/dep_threads = null_dep/" meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         -Dtests=disabled &&\
     meson compile -C build &&\
