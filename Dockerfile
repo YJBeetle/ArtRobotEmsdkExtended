@@ -140,14 +140,12 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd .. && rm -rf pixman-${PIXMAN_VERSION}.tar.gz pixman-${PIXMAN_VERSION}
 
 # libffi
-ENV IFFI_VERSION=3.4.4
-# see https://github.com/kleisauke/wasm-vips/blob/master/build.sh#L258
+ENV IFFI_VERSION=3.7.1
+# Emscripten wasm32 support is included in current libffi releases.
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://github.com/libffi/libffi/releases/download/v${IFFI_VERSION}/libffi-${IFFI_VERSION}.tar.gz &&\
     tar xvf libffi-${IFFI_VERSION}.tar.gz &&\
     cd libffi-${IFFI_VERSION} &&\
-    curl -Ls https://github.com/libffi/libffi/compare/v${IFFI_VERSION}...kleisauke:wasm-vips.patch | patch -p1 &&\
-    autoreconf -fiv &&\
     sed -i 's/ -fexceptions//g' configure &&\
     emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking \
         --disable-builddir --disable-multi-os-directory --disable-raw-api --disable-structs --disable-docs &&\
