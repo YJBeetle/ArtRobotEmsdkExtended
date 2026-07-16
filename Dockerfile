@@ -43,7 +43,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd zlib-${ZLIB_VERSION} &&\
     sed -i "s|add_library(zlib SHARED |add_library(zlib STATIC |g" CMakeLists.txt &&\
     sed -i "s|share/pkgconfig|lib/pkgconfig|g" CMakeLists.txt &&\
-    emcmake cmake -B build &&\
+    emcmake cmake -B build -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} &&\
     cmake --build build &&\
     cmake --install build &&\
     cd .. && rm -rf zlib-${ZLIB_VERSION}.tar.xz zlib-${ZLIB_VERSION}
