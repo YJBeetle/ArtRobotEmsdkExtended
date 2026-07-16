@@ -176,13 +176,14 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 
 # cairo
 # 需要 libpng pixman freetype zlib glib
+# Keep Cairo single-threaded and skip native csi utilities that are not installed in the sysroot.
 ENV CAIRO_VERSION=1.18.4
-ADD cairo-1.18.4-emscripten.patch ${BUILD_DIR}/cairo-1.18.4-emscripten.patch
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://www.cairographics.org/releases/cairo-${CAIRO_VERSION}.tar.xz &&\
     tar xvf cairo-${CAIRO_VERSION}.tar.xz &&\
     cd cairo-${CAIRO_VERSION} &&\
-    patch -p1 < ../cairo-1.18.4-emscripten.patch &&\
+    sed -i "/\['-D_REENTRANT'\], \['-lpthread'\]/d; /\['-pthread'\], \[\]/d" meson.build &&\
+    sed -i "/^subdir('util')$/d" meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         -Dfontconfig=enabled -Dfreetype=enabled -Dpng=enabled -Dzlib=enabled -Dglib=disabled \
         -Ddwrite=disabled -Dquartz=disabled -Dxcb=disabled -Dxlib=disabled -Dxlib-xcb=disabled \
