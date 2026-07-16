@@ -114,17 +114,17 @@ RUN apt update &&\
 
 # fontconfig
 # 需要 freetype expat gperf
-ENV FONTCONFIG_VERSION=2.14.1
+ENV FONTCONFIG_VERSION=2.18.2
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
-    wget https://www.freedesktop.org/software/fontconfig/release/fontconfig-${FONTCONFIG_VERSION}.tar.xz &&\
-    tar xvf fontconfig-${FONTCONFIG_VERSION}.tar.xz &&\
+    wget https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/${FONTCONFIG_VERSION}/fontconfig-${FONTCONFIG_VERSION}.tar.gz &&\
+    tar xvf fontconfig-${FONTCONFIG_VERSION}.tar.gz &&\
     cd fontconfig-${FONTCONFIG_VERSION} &&\
     sed -i "s|error('FIXME: implement cc.preprocess')|cpp += \['-E', '-P'\]|g" src/meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         -Dtests=disabled -Ddoc=disabled -Dtools=disabled &&\
     meson compile -C build &&\
     meson install -C build &&\
-    cd .. && rm -rf fontconfig-${FONTCONFIG_VERSION}.tar.xz fontconfig-${FONTCONFIG_VERSION}
+    cd .. && rm -rf fontconfig-${FONTCONFIG_VERSION}.tar.gz fontconfig-${FONTCONFIG_VERSION}
 
 # pixman
 # 需要 zlib
