@@ -176,22 +176,19 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 
 # cairo
 # 需要 libpng pixman freetype zlib glib
-ENV CAIRO_VERSION=1.16.0
+ENV CAIRO_VERSION=1.18.4
+ADD cairo-1.18.4-emscripten.patch ${BUILD_DIR}/cairo-1.18.4-emscripten.patch
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://www.cairographics.org/releases/cairo-${CAIRO_VERSION}.tar.xz &&\
     tar xvf cairo-${CAIRO_VERSION}.tar.xz &&\
     cd cairo-${CAIRO_VERSION} &&\
-    emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking \
-        -without-x \
-        --disable-xlib --disable-xlib-xrender --disable-directfb --disable-win32 --enable-script \
-        --enable-pdf --enable-ps --enable-svg --enable-png \
-        --enable-interpreter --disable-xlib-xcb --disable-xcb --disable-xcb-shm \
-        --enable-ft --enable-fc \
-        --enable-pthread \
-        ax_cv_c_float_words_bigendian=no ac_cv_lib_z_compress=yes \
-        CFLAGS="-pthread" &&\
-    emmake make -j2 &&\
-    emmake make install &&\
+    patch -p1 < ../cairo-1.18.4-emscripten.patch &&\
+    meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
+        -Dfontconfig=enabled -Dfreetype=enabled -Dpng=enabled -Dzlib=enabled -Dglib=disabled \
+        -Ddwrite=disabled -Dquartz=disabled -Dxcb=disabled -Dxlib=disabled -Dxlib-xcb=disabled \
+        -Dtests=disabled -Dlzo=disabled -Dspectre=disabled -Dsymbol-lookup=disabled &&\
+    meson compile -C build &&\
+    meson install -C build &&\
     cd .. && rm -rf cairo-${CAIRO_VERSION}.tar.xz cairo-${CAIRO_VERSION}
 
 # harfbuzz
