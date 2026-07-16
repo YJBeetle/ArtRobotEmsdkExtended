@@ -314,6 +314,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     export PKG_CONFIG_ALLOW_CROSS=1 &&\
     export PKG_CONFIG_PATH=${PREFIX_DIR}/lib/pkgconfig:${PREFIX_DIR}/share/pkgconfig &&\
     export CARGO_TARGET_WASM32_UNKNOWN_EMSCRIPTEN_LINKER=emcc &&\
+    export CARGO_PROFILE_RELEASE_PANIC=abort &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         -Dtriplet=wasm32-unknown-emscripten -Drsvg-convert=disabled -Dpixbuf-loader=disabled \
         -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled -Dtests=false -Davif=disabled &&\
