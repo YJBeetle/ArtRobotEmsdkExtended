@@ -206,6 +206,8 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://github.com/harfbuzz/harfbuzz/releases/download/${HARFBUZZ_VERSION}/harfbuzz-${HARFBUZZ_VERSION}.tar.xz &&\
     tar xvf harfbuzz-${HARFBUZZ_VERSION}.tar.xz &&\
     cd harfbuzz-${HARFBUZZ_VERSION} &&\
+    # HarfBuzz 会自动探测 pthread；Emscripten 单线程构建保留其默认空线程依赖。
+    sed -i "s/host_machine.system() != 'windows'/host_machine.system() != 'windows' and host_machine.system() != 'emscripten'/" meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         -Dglib=disabled -Dgobject=disabled -Dcairo=enabled -Dfreetype=enabled \
         -Draster=disabled -Dvector=disabled -Dgpu=disabled -Dutilities=disabled \
