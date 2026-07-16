@@ -185,9 +185,9 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     tar xvf cairo-${CAIRO_VERSION}.tar.xz &&\
     cd cairo-${CAIRO_VERSION} &&\
     sed -i "/\['-D_REENTRANT'\], \['-lpthread'\]/d; /\['-pthread'\], \[\]/d" meson.build &&\
-    sed -i "/^subdir('util')$/d" meson.build &&\
+    sed -i "s/^if conf.get('CAIRO_HAS_INTERPRETER'.*/if false/; s/^if conf.get('CAIRO_HAS_TRACE'.*/if false/" util/meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
-        -Dfontconfig=enabled -Dfreetype=enabled -Dpng=enabled -Dzlib=enabled -Dglib=disabled \
+        -Dfontconfig=enabled -Dfreetype=enabled -Dpng=enabled -Dzlib=enabled -Dglib=enabled \
         -Ddwrite=disabled -Dquartz=disabled -Dxcb=disabled -Dxlib=disabled -Dxlib-xcb=disabled \
         -Dtests=disabled -Dlzo=disabled -Dspectre=disabled -Dsymbol-lookup=disabled &&\
     meson compile -C build &&\
