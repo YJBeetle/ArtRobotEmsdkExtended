@@ -87,7 +87,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd .. && rm -rf freetype-${FREETYPE_VERSION}.tar.xz freetype-${FREETYPE_VERSION}
 
 # expat
-ENV EXPAT_VERSION=2.5.0
+ENV EXPAT_VERSION=2.8.2
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://github.com/libexpat/libexpat/releases/download/R_$(printf '%s' "${EXPAT_VERSION}" | tr . _)/expat-${EXPAT_VERSION}.tar.xz &&\
     tar xvf expat-${EXPAT_VERSION}.tar.xz &&\
