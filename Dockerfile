@@ -249,15 +249,16 @@ RUN apt update &&\
     rm -rf /var/lib/apt/lists/*
 
 # libxml2
-ENV XML_VERSION=2.10.3
+ENV XML_VERSION=2.15.3
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://download.gnome.org/sources/libxml2/${XML_VERSION%.*}/libxml2-${XML_VERSION}.tar.xz &&\
     tar xvf libxml2-${XML_VERSION}.tar.xz &&\
     cd libxml2-${XML_VERSION} &&\
-    emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking \
-        --without-python &&\
-    emmake make -j2 &&\
-    emmake make install &&\
+    meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
+        -Dthreads=disabled -Dtls=disabled -Dthread-alloc=disabled -Dmodules=disabled \
+        -Dpython=disabled -Ddocs=disabled -Ddebugging=disabled -Dhistory=disabled -Dreadline=disabled &&\
+    meson compile -C build &&\
+    meson install -C build &&\
     cd .. && rm -rf libxml2-${XML_VERSION}.tar.xz libxml2-${XML_VERSION}
 
 # shared-mime-info
