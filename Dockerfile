@@ -56,9 +56,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     tar xvf libpng-${PNG_VERSION}.tar.xz &&\
     cd libpng-${PNG_VERSION} &&\
     emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking \
-        --disable-tests --disable-tools \
-        CFLAGS="-I${PREFIX_DIR}/include/ -pthread" \
-        LDFLAGS="-L${PREFIX_DIR}/lib -pthread" &&\
+        --disable-tests --disable-tools &&\
     emmake make -j2 &&\
     emmake make install &&\
     cd .. && rm -rf libpng-${PNG_VERSION}.tar.xz libpng-${PNG_VERSION}
