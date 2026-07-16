@@ -122,6 +122,8 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     tar xvf fontconfig-${FONTCONFIG_VERSION}.tar.gz &&\
     cd fontconfig-${FONTCONFIG_VERSION} &&\
     sed -i "s|error('FIXME: implement cc.preprocess')|cpp += \['-E', '-P'\]|g" src/meson.build &&\
+    # Fontconfig 2.18.2 未在 Meson 的线程探测中排除 Emscripten；单线程构建不应注入 -pthread。
+    sed -i "s/host_machine.system() != 'windows'/host_machine.system() != 'windows' and host_machine.system() != 'emscripten'/" meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         -Dtests=disabled -Ddoc=disabled -Dtools=disabled &&\
     meson compile -C build &&\
