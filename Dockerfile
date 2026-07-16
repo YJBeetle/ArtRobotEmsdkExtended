@@ -75,7 +75,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 
 # freetype
 # 需要 libpng zlib
-ENV FREETYPE_VERSION=2.13.0
+ENV FREETYPE_VERSION=2.14.3
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://download.sourceforge.net/freetype/freetype-${FREETYPE_VERSION}.tar.xz &&\
     tar xvf freetype-${FREETYPE_VERSION}.tar.xz &&\
