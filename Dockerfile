@@ -160,17 +160,17 @@ RUN apt update &&\
 
 # glib
 # 需要 libffi
-ENV GLIB_VERSION=2.76.2
-# see https://github.com/kleisauke/wasm-vips/blob/master/build.sh#L273
+ENV GLIB_VERSION=2.89.1
+# See https://github.com/kleisauke/wasm-vips/blob/master/build.sh
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://download.gnome.org/sources/glib/${GLIB_VERSION%.*}/glib-${GLIB_VERSION}.tar.xz &&\
     tar xvf glib-${GLIB_VERSION}.tar.xz &&\
     cd glib-${GLIB_VERSION} &&\
     curl -Ls https://github.com/GNOME/glib/compare/${GLIB_VERSION}...kleisauke:wasm-vips-${GLIB_VERSION}.patch | patch -p1 &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
-        --force-fallback-for=gvdb -Dselinux=disabled -Dxattr=false -Dlibmount=disabled -Dnls=disabled \
-        -Dtests=false -Dglib_assert=false -Dglib_checks=false &&\
-    meson install -C build &&\
+        --force-fallback-for=gvdb -Dintrospection=disabled -Dselinux=disabled -Dxattr=false -Dlibmount=disabled \
+        -Dsysprof=disabled -Dnls=disabled -Dglib_debug=disabled -Dtests=false -Dglib_assert=false -Dglib_checks=false &&\
+    meson install -C build --tag devel &&\
     ln -s ${PREFIX_DIR}/lib/pkgconfig/gio-2.0.pc ${PREFIX_DIR}/lib/pkgconfig/gio-unix-2.0.pc &&\
     cd .. && rm -rf glib-${GLIB_VERSION}.tar.xz glib-${GLIB_VERSION}
 
