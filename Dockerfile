@@ -227,19 +227,18 @@ RUN apt update &&\
 
 # Pango
 # 需要 harfbuzz fribidi fontconfig freetype glib cairo libglib2.0-dev-bin
-ENV PANGO_VERSION=1.50.14
+ENV PANGO_VERSION=1.58.0
 # Remove pthread flags leaked by dependency metadata; all sysroot libraries are single-threaded.
+# Pango has no Meson switches for disabling its native utility binaries.
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     sed -i 's/ -pthread//g' ${PREFIX_DIR}/lib/pkgconfig/*.pc &&\
     wget https://download.gnome.org/sources/pango/${PANGO_VERSION%.*}/pango-${PANGO_VERSION}.tar.xz &&\
     tar xvf pango-${PANGO_VERSION}.tar.xz &&\
     cd pango-${PANGO_VERSION} &&\
-    sed -i "s|subdir('examples')||g" meson.build &&\
-    sed -i "s|subdir('tests')||g" meson.build &&\
     sed -i "s|subdir('utils')||g" meson.build &&\
     sed -i "s|subdir('tools')||g" meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
-        -Dintrospection=disabled -Dinstall-tests=false &&\
+        -Dintrospection=disabled -Dbuild-testsuite=false -Dbuild-examples=false &&\
     meson compile -C build &&\
     meson install -C build &&\
     cd .. && rm -rf pango-${PANGO_VERSION}.tar.xz pango-${PANGO_VERSION}
