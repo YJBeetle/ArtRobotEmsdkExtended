@@ -25,7 +25,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 # libjpeg
 ENV JPEG_VERSION=3.2.0
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
-    wget https://download.sourceforge.net/libjpeg-turbo/libjpeg-turbo-${JPEG_VERSION}.tar.gz &&\
+    wget https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/${JPEG_VERSION}/libjpeg-turbo-${JPEG_VERSION}.tar.gz &&\
     tar xvf libjpeg-turbo-${JPEG_VERSION}.tar.gz &&\
     cd libjpeg-turbo-${JPEG_VERSION} &&\
     emcmake cmake -B build -DCMAKE_INSTALL_PREFIX=${PREFIX_DIR} &&\
