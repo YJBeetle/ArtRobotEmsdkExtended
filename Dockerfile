@@ -276,7 +276,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 
 # gdk-pixbuf
 # 需要 shared-mime-info
-ENV GDK_PIXBUF_VERSION=2.42.9
+ENV GDK_PIXBUF_VERSION=2.44.7
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://download.gnome.org/sources/gdk-pixbuf/${GDK_PIXBUF_VERSION%.*}/gdk-pixbuf-${GDK_PIXBUF_VERSION}.tar.xz &&\
     tar xvf gdk-pixbuf-${GDK_PIXBUF_VERSION}.tar.xz &&\
@@ -285,7 +285,8 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     sed -i "s|\[ 'gdk-pixbuf-pixdata' \],||g" gdk-pixbuf/meson.build &&\
     sed -i "s|\[ 'gdk-pixbuf-query-loaders', \[ 'queryloaders.c' \] \],||g" gdk-pixbuf/meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
-        -Dman=false -Dtests=false -Dbuiltin_loaders=none &&\
+        -Dman=false -Dtests=false -Dinstalled_tests=false -Dintrospection=disabled \
+        -Dbuiltin_loaders=all -Dglycin=disabled -Dandroid=disabled -Dtiff=disabled &&\
     meson compile -C build &&\
     meson install -C build &&\
     cd .. && rm -rf gdk-pixbuf-${GDK_PIXBUF_VERSION}.tar.xz gdk-pixbuf-${GDK_PIXBUF_VERSION}
