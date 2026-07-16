@@ -292,29 +292,25 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     meson install -C build &&\
     cd .. && rm -rf gdk-pixbuf-${GDK_PIXBUF_VERSION}.tar.xz gdk-pixbuf-${GDK_PIXBUF_VERSION}
 
-# cargo
-RUN apt update &&\
-    apt install -y cargo &&\
-    rm -rf /var/lib/apt/lists/*
-
 # rsvg
 # 需要 libxml2 gdk-pixbuf
-ENV RSVG_VERSION=2.55.1
+ENV RSVG_VERSION=2.62.3
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
+    apt update && apt install -y libssl-dev && rm -rf /var/lib/apt/lists/* &&\
     wget https://download.gnome.org/sources/librsvg/${RSVG_VERSION%.*}/librsvg-${RSVG_VERSION}.tar.xz &&\
     tar xvf librsvg-${RSVG_VERSION}.tar.xz &&\
     cd librsvg-${RSVG_VERSION} &&\
-    apt remove rustc -y &&\
     curl https://sh.rustup.rs -sSf | sh -s -- -y --target wasm32-unknown-emscripten &&\
-    source "$HOME/.cargo/env" &&\
-    emconfigure ./configure --host=wasm32-unknown-linux --prefix=${PREFIX_DIR} --enable-static --disable-shared --disable-dependency-tracking \
-        --disable-gtk-doc --disable-installed-tests --disable-always-build-tests --disable-pixbuf-loader --disable-introspection \
-        RUST_TARGET=wasm32-unknown-emscripten &&\
-    sed -i "s|#CARGO_TARGET_ARGS = --target=\$(RUST_TARGET)|CARGO_TARGET_ARGS = --target=\$(RUST_TARGET)|g" Makefile &&\
-    sed -i "s|RUST_TARGET_SUBDIR = release|RUST_TARGET_SUBDIR = wasm32-unknown-emscripten/release|g" Makefile &&\
-    sed -i "s|bin_SCRIPTS = rsvg-convert\$(EXEEXT)||g" Makefile &&\
-    emmake make -j2 &&\
-    emmake make install &&\
+    . "$HOME/.cargo/env" &&\
+    cargo install cargo-c --version 0.10.10 --locked &&\
+    export PKG_CONFIG_ALLOW_CROSS=1 &&\
+    export PKG_CONFIG_PATH=${PREFIX_DIR}/lib/pkgconfig:${PREFIX_DIR}/share/pkgconfig &&\
+    export CARGO_TARGET_WASM32_UNKNOWN_EMSCRIPTEN_LINKER=emcc &&\
+    meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
+        -Dtriplet=wasm32-unknown-emscripten -Drsvg-convert=disabled -Dpixbuf-loader=disabled \
+        -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled -Dtests=false -Davif=disabled &&\
+    meson compile -C build &&\
+    meson install -C build &&\
     rustup self uninstall -y &&\
     cd .. && rm -rf librsvg-${RSVG_VERSION}.tar.xz librsvg-${RSVG_VERSION}
 
