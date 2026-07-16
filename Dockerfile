@@ -193,13 +193,15 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd .. && rm -rf cairo-${CAIRO_VERSION}.tar.xz cairo-${CAIRO_VERSION}
 
 # harfbuzz
-ENV HARFBUZZ_VERSION=7.3.0
+ENV HARFBUZZ_VERSION=14.2.1
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://github.com/harfbuzz/harfbuzz/releases/download/${HARFBUZZ_VERSION}/harfbuzz-${HARFBUZZ_VERSION}.tar.xz &&\
     tar xvf harfbuzz-${HARFBUZZ_VERSION}.tar.xz &&\
     cd harfbuzz-${HARFBUZZ_VERSION} &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
-        -Dglib=disabled -Dgobject=disabled -Dcairo=enabled -Dfreetype=enabled -Ddocs=disabled -Dtests=disabled &&\
+        -Dglib=disabled -Dgobject=disabled -Dcairo=enabled -Dfreetype=enabled \
+        -Draster=disabled -Dvector=disabled -Dgpu=disabled -Dutilities=disabled \
+        -Ddocs=disabled -Dtests=disabled &&\
     meson compile -C build &&\
     meson install -C build &&\
     cd .. && rm -rf harfbuzz-${HARFBUZZ_VERSION}.tar.xz harfbuzz-${HARFBUZZ_VERSION}
