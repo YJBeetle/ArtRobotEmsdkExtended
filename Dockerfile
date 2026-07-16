@@ -23,7 +23,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd .. && rm -rf opencv-${OPENCV_VERSION}.tar.gz opencv-${OPENCV_VERSION}
 
 # libjpeg
-ENV JPEG_VERSION=2.1.4
+ENV JPEG_VERSION=3.2.0
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     wget https://download.sourceforge.net/libjpeg-turbo/libjpeg-turbo-${JPEG_VERSION}.tar.gz &&\
     tar xvf libjpeg-turbo-${JPEG_VERSION}.tar.gz &&\
