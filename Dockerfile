@@ -1,4 +1,6 @@
-FROM emscripten/emsdk:6.0.2
+# Build all WebAssembly artifacts on the native build platform. The resulting
+# Emscripten sysroot is host-independent and can be copied into each target image.
+FROM --platform=$BUILDPLATFORM emscripten/emsdk:6.0.2 AS extended-sysroot
 
 SHELL ["/bin/bash", "-c"]
 
@@ -355,3 +357,43 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 
 # clean meson
 RUN rm ${BUILD_DIR}/emscripten.txt
+
+# Keep target-native SDK tools while reusing the platform-independent sysroot
+# produced above. Only this lightweight stage needs emulation for an ARM image
+# built on an amd64 runner.
+FROM emscripten/emsdk:6.0.2
+
+SHELL ["/bin/bash", "-c"]
+
+ENV BUILD_DIR=/i
+ENV PREFIX_DIR=/emsdk/upstream/emscripten/cache/sysroot
+ENV EMCC_CFLAGS="-sSHARED_MEMORY=0 -mno-atomics"
+ENV OPENCV_VERSION=5.0.0
+ENV JPEG_VERSION=3.2.0
+ENV ZLIB_VERSION=1.3.2
+ENV PNG_VERSION=1.6.58
+ENV WEBP_VERSION=1.6.0
+ENV FREETYPE_VERSION=2.14.3
+ENV EXPAT_VERSION=2.8.2
+ENV FONTCONFIG_VERSION=2.18.2
+ENV PIXMAN_VERSION=0.46.4
+ENV IFFI_VERSION=3.7.1
+ENV PCRE2_VERSION=10.47
+ENV GLIB_VERSION=2.89.1
+ENV CAIRO_VERSION=1.18.4
+ENV HARFBUZZ_VERSION=14.2.1
+ENV FRIBIDI_VERSION=1.0.16
+ENV PANGO_VERSION=1.58.0
+ENV XML_VERSION=2.15.3
+ENV SHARED_MIME_INFO_VERSION=2.5.1
+ENV GDK_PIXBUF_VERSION=2.44.7
+ENV RSVG_VERSION=2.62.3
+ENV RUST_TOOLCHAIN=1.92.0
+
+RUN apt update &&\
+    apt install -y pkg-config libtool python3 ninja-build gperf gettext \
+        libssl-dev libglib2.0-dev-bin libxml2-utils &&\
+    rm -rf /var/lib/apt/lists/* &&\
+    python3 -m pip install --break-system-packages meson
+
+COPY --from=extended-sysroot ${PREFIX_DIR}/ ${PREFIX_DIR}/
