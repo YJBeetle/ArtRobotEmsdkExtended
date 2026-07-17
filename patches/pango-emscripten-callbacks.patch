@@ -2,14 +2,14 @@ diff --git a/pango/pango-item.c b/pango/pango-item.c
 index b6a9c67..15b47fb 100644
 --- a/pango/pango-item.c
 +++ b/pango/pango-item.c
-@@ -101,8 +101,8 @@ pango_item_free (PangoItem *item)
+@@ -101,8 +101,9 @@ pango_item_free (PangoItem *item)
  
    if (item->analysis.extra_attrs)
      {
 -      g_slist_foreach (item->analysis.extra_attrs, (GFunc)pango_attribute_destroy, NULL);
--      g_slist_free (item->analysis.extra_attrs);
-+      g_slist_free_full (item->analysis.extra_attrs,
-+                         (GDestroyNotify)pango_attribute_destroy);
++      for (GSList *l = item->analysis.extra_attrs; l; l = l->next)
++        pango_attribute_destroy (l->data);
+       g_slist_free (item->analysis.extra_attrs);
      }
  
    if (item->analysis.lang_engine)
@@ -17,14 +17,14 @@ diff --git a/pango/pango-markup.c b/pango/pango-markup.c
 index 3b0bc54..99bc10d 100644
 --- a/pango/pango-markup.c
 +++ b/pango/pango-markup.c
-@@ -193,8 +193,8 @@ scale_factor (int scale_level, double base)
+@@ -193,8 +193,9 @@ scale_factor (int scale_level, double base)
  static void
  open_tag_free (OpenTag *ot)
  {
 -  g_slist_foreach (ot->attrs, (GFunc) pango_attribute_destroy, NULL);
--  g_slist_free (ot->attrs);
-+  g_slist_free_full (ot->attrs,
-+                     (GDestroyNotify) pango_attribute_destroy);
++  for (GSList *l = ot->attrs; l; l = l->next)
++    pango_attribute_destroy (l->data);
+   g_slist_free (ot->attrs);
    g_slice_free (OpenTag, ot);
  }
  
@@ -32,13 +32,14 @@ diff --git a/pango/pango-context.c b/pango/pango-context.c
 index 402aac6..d75e403 100644
 --- a/pango/pango-context.c
 +++ b/pango/pango-context.c
-@@ -722,8 +722,7 @@ pango_context_get_metrics (PangoContext               *context,
+@@ -722,8 +722,9 @@ pango_context_get_metrics (PangoContext               *context,
  
    update_metrics_from_items (metrics, language, sample_str, text_len, items);
  
 -  g_list_foreach (items, (GFunc)pango_item_free, NULL);
--  g_list_free (items);
-+  g_list_free_full (items, (GDestroyNotify)pango_item_free);
++  for (GList *l = items; l; l = l->next)
++    pango_item_free (l->data);
+   g_list_free (items);
  
    g_object_unref (current_fonts);
  
@@ -46,14 +47,14 @@ diff --git a/pango/pangofc-font.c b/pango/pangofc-font.c
 index 9eb046d..761a238 100644
 --- a/pango/pangofc-font.c
 +++ b/pango/pangofc-font.c
-@@ -167,8 +167,8 @@ pango_fc_font_finalize (GObject *object)
+@@ -167,8 +167,9 @@ pango_fc_font_finalize (GObject *object)
    PangoFcFontPrivate *priv = fcfont->priv;
    PangoFontMap *fontmap;
  
 -  g_slist_foreach (fcfont->metrics_by_lang, (GFunc)free_metrics_info, NULL);
--  g_slist_free (fcfont->metrics_by_lang);
-+  g_slist_free_full (fcfont->metrics_by_lang,
-+                     (GDestroyNotify)free_metrics_info);
++  for (GSList *l = fcfont->metrics_by_lang; l; l = l->next)
++    free_metrics_info (l->data);
+   g_slist_free (fcfont->metrics_by_lang);
  
    fontmap = fcfont->fontmap;
    if (fontmap)
@@ -61,14 +62,14 @@ diff --git a/pango/pangocairo-font.c b/pango/pangocairo-font.c
 index bfaf734..121cfb9 100644
 --- a/pango/pangocairo-font.c
 +++ b/pango/pangocairo-font.c
-@@ -1134,8 +1134,8 @@ _pango_cairo_font_private_finalize (PangoCairoFontPrivate *cf_priv)
+@@ -1134,8 +1134,9 @@ _pango_cairo_font_private_finalize (PangoCairoFontPrivate *cf_priv)
      g_free (cf_priv->glyph_extents_cache);
    cf_priv->glyph_extents_cache = NULL;
  
 -  g_slist_foreach (cf_priv->metrics_by_lang, (GFunc)free_metrics_info, NULL);
--  g_slist_free (cf_priv->metrics_by_lang);
-+  g_slist_free_full (cf_priv->metrics_by_lang,
-+                     (GDestroyNotify)free_metrics_info);
++  for (GSList *l = cf_priv->metrics_by_lang; l; l = l->next)
++    free_metrics_info (l->data);
+   g_slist_free (cf_priv->metrics_by_lang);
    cf_priv->metrics_by_lang = NULL;
  }
  
