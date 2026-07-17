@@ -1,0 +1,98 @@
+diff --git a/pango/pangofc-fontmap.c b/pango/pangofc-fontmap.c
+index 4a393c44..1776a6c0 100644
+--- a/pango/pangofc-fontmap.c
++++ b/pango/pangofc-fontmap.c
+@@ -1028,6 +1028,37 @@ fc_thread_func (gpointer data)
+   return NULL;
+ }
+ 
++static void
++schedule_fc_task (GAsyncQueue *queue G_GNUC_UNUSED,
++                  ThreadData  *td)
++{
++#ifdef __EMSCRIPTEN__
++  switch (td->op)
++    {
++    case FC_INIT:
++      init_in_thread (td);
++      break;
++
++    case FC_MATCH:
++      match_in_thread (td);
++      break;
++
++    case FC_SORT:
++      sort_in_thread (td);
++      break;
++
++    case FC_END:
++      thread_data_free (td);
++      break;
++
++    default:
++      g_assert_not_reached ();
++    }
++#else
++  g_async_queue_push (queue, td);
++#endif
++}
++
+ static PangoFcPatterns *
+ pango_fc_patterns_new (FcPattern *pat, PangoFcFontMap *fontmap)
+ {
+@@ -1048,7 +1079,7 @@ pango_fc_patterns_new (FcPattern *pat, PangoFcFontMap *fontmap)
+   g_mutex_init (&pats->mutex);
+   g_cond_init (&pats->cond);
+ 
+-  g_async_queue_push (fontmap->priv->queue, thread_data_new (FC_MATCH, pats));
++  schedule_fc_task (fontmap->priv->queue, thread_data_new (FC_MATCH, pats));
+ 
+   g_hash_table_insert (fontmap->priv->patterns_hash, pats->pattern, pats);
+ 
+@@ -1224,7 +1255,7 @@ pango_fc_patterns_get_font_pattern (PangoFcPatterns *pats, int i, gboolean *prepa
+       before = PANGO_TRACE_CURRENT_TIME;
+ 
+       if (!pats->fontset)
+-        g_async_queue_push (pats->fontmap->priv->queue, thread_data_new (FC_SORT, pats));
++        schedule_fc_task (pats->fontmap->priv->queue, thread_data_new (FC_SORT, pats));
+ 
+       g_mutex_lock (&pats->mutex);
+ 
+@@ -1525,6 +1556,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_CODE (PangoFcFontMap, pango_fc_font_map, PANGO_TYPE_F
+ static void
+ start_fontconfig_thread (PangoFcFontMap *fcfontmap)
+ {
++#ifndef __EMSCRIPTEN__
+   GThread *thread;
+ 
+   g_mutex_lock (&fc_init_mutex);
+@@ -1540,6 +1572,20 @@ start_fontconfig_thread (PangoFcFontMap *fcfontmap)
+     }
+ 
+   g_mutex_unlock (&fc_init_mutex);
++#else
++  ThreadData *init_task = NULL;
++
++  g_mutex_lock (&fc_init_mutex);
++  if (fc_initialized == DEFAULT_CONFIG_NOT_INITIALIZED)
++    {
++      fc_initialized = DEFAULT_CONFIG_INITIALIZING;
++      init_task = thread_data_new (FC_INIT, NULL);
++    }
++  g_mutex_unlock (&fc_init_mutex);
++
++  if (init_task)
++    schedule_fc_task (fcfontmap->priv->queue, init_task);
++#endif
+ }
+ 
+ static void
+@@ -1630,7 +1676,7 @@ pango_fc_font_map_fini (PangoFcFontMap *fcfontmap)
+   priv->n_families = -1;
+   priv->families = NULL;
+ 
+-  g_async_queue_push (fcfontmap->priv->queue, thread_data_new (FC_END, NULL));
++  schedule_fc_task (fcfontmap->priv->queue, thread_data_new (FC_END, NULL));
+ 
+   g_async_queue_unref (priv->queue);
+   priv->queue = NULL;
