@@ -331,18 +331,20 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
 # rsvg
 # 需要 libxml2 gdk-pixbuf
 ENV RSVG_VERSION=2.62.3
+# Rust 1.93 changed wasm32-unknown-emscripten's prebuilt std to Wasm EH, which
+# introduces a __cpp_exception dependency. 1.92 is librsvg 2.62's MSRV.
+ENV RUST_TOOLCHAIN=1.92.0
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     apt update && apt install -y libssl-dev && rm -rf /var/lib/apt/lists/* &&\
     wget https://download.gnome.org/sources/librsvg/${RSVG_VERSION%.*}/librsvg-${RSVG_VERSION}.tar.xz &&\
     tar xvf librsvg-${RSVG_VERSION}.tar.xz &&\
     cd librsvg-${RSVG_VERSION} &&\
-    curl https://sh.rustup.rs -sSf | sh -s -- -y --target wasm32-unknown-emscripten &&\
+    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain ${RUST_TOOLCHAIN} --profile minimal --target wasm32-unknown-emscripten &&\
     . "$HOME/.cargo/env" &&\
     cargo install cargo-c --version 0.10.10 --locked &&\
     export PKG_CONFIG_ALLOW_CROSS=1 &&\
     export PKG_CONFIG_PATH=${PREFIX_DIR}/lib/pkgconfig:${PREFIX_DIR}/share/pkgconfig &&\
     export CARGO_TARGET_WASM32_UNKNOWN_EMSCRIPTEN_LINKER=emcc &&\
-    export CARGO_PROFILE_RELEASE_PANIC=abort &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         -Dtriplet=wasm32-unknown-emscripten -Drsvg-convert=disabled -Dpixbuf-loader=disabled \
         -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled -Dtests=false -Davif=disabled &&\
