@@ -268,6 +268,7 @@ RUN apt update &&\
 ENV PANGO_VERSION=1.58.0
 COPY patches/pango-emscripten-function-pointers.patch /tmp/pango-emscripten-function-pointers.patch
 COPY patches/pango-emscripten-single-thread.patch /tmp/pango-emscripten-single-thread.patch
+COPY patches/pango-emscripten-callbacks.patch /tmp/pango-emscripten-callbacks.patch
 # Remove pthread flags leaked by dependency metadata; all sysroot libraries are single-threaded.
 # Pango has no Meson switches for disabling its native utility binaries.
 RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
@@ -277,6 +278,7 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     cd pango-${PANGO_VERSION} &&\
     patch -p1 < /tmp/pango-emscripten-function-pointers.patch &&\
     patch -p1 < /tmp/pango-emscripten-single-thread.patch &&\
+    patch -p1 < /tmp/pango-emscripten-callbacks.patch &&\
     sed -i "s|subdir('utils')||g" meson.build &&\
     sed -i "s|subdir('tools')||g" meson.build &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
