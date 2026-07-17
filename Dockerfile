@@ -194,6 +194,15 @@ RUN mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR} &&\
     sed -i "/'grefstring.c',/a\  'gregex.c'," glib/meson.build &&\
     sed -i "/# Import the gvdb sources/i pcre2 = dependency('libpcre2-8', version: '>=10.32')" meson.build &&\
     sed -i "/libsysprof_capture_dep,/a\    pcre2," glib/meson.build &&\
+    # 仅恢复 librsvg 静态链接需要、且已由 wasm-vips 适配的 Unix I/O 实现。
+    sed -i "s/glib_sources += files('glib-unix.c', 'giounix.c')/glib_sources += files('giounix.c')/" glib/meson.build &&\
+    sed -i "0,/if host_system != 'emscripten'/s//if true/" glib/meson.build &&\
+    sed -i "/contenttype_sources += files('gcontenttype-wasm.c')/a\  unix_sources = files('gfiledescriptorbased.c', 'giounix-private.c', 'gunixfdmessage.c', 'gunixinputstream.c', 'gdesktopappinfo.c')" gio/meson.build &&\
+    sed -i "s/#ifdef G_OS_UNIX/#if defined(G_OS_UNIX) \&\& !defined(G_PLATFORM_WASM)/" gio/gdesktopappinfo.c &&\
+    sed -i "/#include \"glibintl.h\"/a char *_g_unix_content_type_unalias (const char *type) { return g_strdup (type); }\nchar **_g_unix_content_type_get_parents (const char *type) { return g_new0 (char *, 1); }" gio/gcontenttype-wasm.c &&\
+    sed -i "/inner_source = g_unix_fd_source_new/i #ifndef G_PLATFORM_WASM" gio/gunixinputstream.c &&\
+    sed -i "/g_source_unref (inner_source);/a #endif" gio/gunixinputstream.c &&\
+    sed -i '$a #ifdef G_PLATFORM_WASM\nvoid g_subprocess_send_signal (GSubprocess *subprocess, gint signal_num) { g_return_if_fail (G_IS_SUBPROCESS (subprocess)); }\n#endif' gio/gsubprocess.c &&\
     meson setup build --prefix=${PREFIX_DIR} --cross-file=../emscripten.txt --default-library=static --buildtype=release \
         --force-fallback-for=gvdb -Dintrospection=disabled -Dselinux=disabled -Dxattr=false -Dlibmount=disabled \
         -Dsysprof=disabled -Dnls=disabled -Dglib_debug=disabled -Dtests=false -Dglib_assert=false -Dglib_checks=false &&\
